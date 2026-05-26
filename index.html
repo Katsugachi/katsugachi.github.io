@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SolusGH</title>
+  <style>
+    /* ─── Tokens ──────────────────────────────────────────── */
+    :root {
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-xl: 36px;
+      --transition: 0.22s cubic-bezier(.4,0,.2,1);
+    }
+    [data-theme="dark"] {
+      --bg:        #0e0e0e;
+      --surface:   #171717;
+      --surface2:  #222222;
+      --border:    #2e2e2e;
+      --text:      #f0f0f0;
+      --text-sub:  #888888;
+      --accent:    #e0e0e0;
+      --tag-bg:    #2a2a2a;
+      --toggle-bg: #2e2e2e;
+      --hero-glow: rgba(255,255,255,0.03);
+    }
+    [data-theme="light"] {
+      --bg:        #f2f2f2;
+      --surface:   #ffffff;
+      --surface2:  #e8e8e8;
+      --border:    #d0d0d0;
+      --text:      #0e0e0e;
+      --text-sub:  #666666;
+      --accent:    #1a1a1a;
+      --tag-bg:    #e0e0e0;
+      --toggle-bg: #c8c8c8;
+      --hero-glow: rgba(0,0,0,0.03);
+    }
+
+    /* ─── Reset ───────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background var(--transition), color var(--transition);
+      min-height: 100vh;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ─── Nav ─────────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(1rem, 5vw, 3rem);
+      height: 60px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .nav-logo {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+    .nav-logo span { color: var(--text-sub); font-weight: 400; }
+    .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+
+    /* Toggle */
+    .theme-toggle {
+      width: 46px;
+      height: 26px;
+      background: var(--toggle-bg);
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: background var(--transition);
+      flex-shrink: 0;
+    }
+    .theme-toggle::after {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      background: var(--text);
+      border-radius: 50%;
+      top: 4px; left: 4px;
+      transition: transform var(--transition), background var(--transition);
+    }
+    [data-theme="light"] .theme-toggle::after { transform: translateX(20px); }
+    .toggle-label { font-size: 0.78rem; color: var(--text-sub); user-select: none; }
+
+    /* GitHub link */
+    .nav-gh {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      color: var(--text-sub);
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      transition: color var(--transition), border-color var(--transition), background var(--transition);
+    }
+    .nav-gh:hover { color: var(--text); background: var(--surface2); }
+
+    /* ─── Hero ────────────────────────────────────────────── */
+    .hero {
+      padding: clamp(3rem, 8vw, 6rem) clamp(1rem, 5vw, 3rem) clamp(2rem, 5vw, 3.5rem);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 40% at 50% 0%, var(--hero-glow), transparent);
+      pointer-events: none;
+    }
+    .hero-avatar {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 2px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      margin-bottom: 1.25rem;
+      overflow: hidden;
+    }
+    .hero-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+    }
+    .hero-sub {
+      font-size: clamp(0.95rem, 2vw, 1.1rem);
+      color: var(--text-sub);
+      max-width: 480px;
+      margin: 0 auto 1.5rem;
+    }
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .tag {
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: var(--tag-bg);
+      color: var(--text-sub);
+      border: 1px solid var(--border);
+      transition: background var(--transition), color var(--transition);
+      letter-spacing: 0.02em;
+    }
+
+    /* ─── Tabs ────────────────────────────────────────────── */
+    .tabs-wrapper {
+      display: flex;
+      justify-content: center;
+      padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1rem, 5vw, 3rem) 0;
+    }
+    .tabs {
+      display: inline-flex;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 4px;
+      gap: 2px;
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .tab-btn {
+      padding: 8px 22px;
+      border: none;
+      border-radius: calc(var(--radius-xl) - 4px);
+      background: transparent;
+      color: var(--text-sub);
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition);
+      white-space: nowrap;
+    }
+    .tab-btn.active {
+      background: var(--surface2);
+      color: var(--text);
+    }
+    .tab-btn:not(.active):hover {
+      color: var(--text);
+      background: var(--tag-bg);
+    }
+    .tab-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: var(--border);
+      color: var(--text-sub);
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-left: 6px;
+      transition: background var(--transition);
+    }
+    .tab-btn.active .tab-count { background: var(--text-sub); color: var(--bg); }
+
+    /* ─── Content ─────────────────────────────────────────── */
+    .content {
+      padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1rem, 5vw, 3rem) clamp(3rem, 6vw, 5rem);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ─── Section headings ────────────────────────────────── */
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-sub);
+      margin-bottom: 1.25rem;
+    }
+
+    /* ─── Project Grid ────────────────────────────────────── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.4rem 1.5rem 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      transition:
+        background var(--transition),
+        border-color var(--transition),
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+      border-color: var(--text-sub);
+    }
+    [data-theme="light"] .card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.07); }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .card-icon {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+      color: var(--text-sub);
+    }
+    .card-icon svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.75;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .card-links {
+      display: flex;
+      gap: 0.4rem;
+      flex-shrink: 0;
+    }
+    .card-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px; height: 30px;
+      border-radius: var(--radius-sm);
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      color: var(--text-sub);
+      font-size: 0.75rem;
+      font-weight: 600;
+      transition: background var(--transition), color var(--transition), border-color var(--transition);
+    }
+    .card-link:hover { background: var(--surface2); color: var(--text); border-color: var(--text-sub); }
+    .card-link svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .card-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+    }
+    .card-desc {
+      font-size: 0.84rem;
+      color: var(--text-sub);
+      line-height: 1.55;
+      flex-grow: 1;
+    }
+    .card-footer {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .lang-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .lang-label {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+    }
+    .stars-badge {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.73rem;
+      color: var(--text-sub);
+      margin-left: auto;
+    }
+    .stars-badge svg { width: 12px; height: 12px; }
+
+    /* WIP badge */
+    .wip-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: var(--tag-bg);
+      color: var(--text-sub);
+      border: 1px solid var(--border);
+    }
+
+    /* ─── Extras layout ───────────────────────────────────── */
+    .extras-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 0.7rem;
+    }
+    .extra-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      transition:
+        background var(--transition),
+        border-color var(--transition),
+        transform 0.15s ease;
+    }
+    .extra-card:hover { transform: translateY(-1px); border-color: var(--text-sub); }
+    .extra-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .extra-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .extra-link {
+      display: flex;
+      align-items: center;
+      color: var(--text-sub);
+      transition: color var(--transition);
+    }
+    .extra-link:hover { color: var(--text); }
+    .extra-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .extra-desc {
+      font-size: 0.77rem;
+      color: var(--text-sub);
+      line-height: 1.5;
+    }
+    .extra-footer {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.1rem;
+    }
+
+    /* ─── Footer ──────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem clamp(1rem, 5vw, 3rem);
+      text-align: center;
+      color: var(--text-sub);
+      font-size: 0.78rem;
+      transition: border-color var(--transition);
+    }
+    footer a { border-bottom: 1px solid var(--border); padding-bottom: 1px; transition: border-color var(--transition), color var(--transition); }
+    footer a:hover { color: var(--text); border-color: var(--text); }
+
+    /* ─── Language colours (monochrome-ish tints) ─────────── */
+    .lang-html    { background: #777; }
+    .lang-js      { background: #999; }
+    .lang-ts      { background: #aaa; }
+    .lang-css     { background: #666; }
+    .lang-other   { background: #555; }
+
+    /* ─── Responsive ──────────────────────────────────────── */
+    @media (max-width: 540px) {
+      .grid { grid-template-columns: 1fr; }
+      .extras-grid { grid-template-columns: 1fr 1fr; }
+      .toggle-label { display: none; }
+    }
+    @media (max-width: 360px) {
+      .extras-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ─── Animations ──────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .tab-panel.active { animation: fadeUp 0.28s ease; }
+  </style>
+</head>
+<body>
+
+<!-- ─── Nav ─────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-logo">SolusGH</div>
+  <div class="nav-actions">
+    <a class="nav-gh" href="https://github.com/Katsugachi" target="_blank" rel="noopener">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+      </svg>
+      GitHub
+    </a>
+    <span class="toggle-label" id="toggle-label">Dark</span>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark mode"></button>
+  </div>
+</nav>
+
+<!-- ─── Hero ─────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-avatar">
+    <img src="https://avatars.githubusercontent.com/u/220125681?v=4" alt="Katsugachi avatar" onerror="this.style.display='none'" />
+  </div>
+  <h1>SolusGH</h1>
+  <p class="hero-sub">Mini Developer building tools and experiments. Mostly just HTML/JS</p>
+  <div class="hero-tags">
+    <span class="tag">Games &amp; Ports</span>
+    <span class="tag">Tools &amp; Utilities</span>
+    <span class="tag">Chess Engines</span>
+    <span class="tag">Music &amp; Audio</span>
+    <span class="tag">Pure HTML/JS</span>
+    <span class="tag">Open Source</span>
+  </div>
+</section>
+
+<!-- ─── Tabs ──────────────────────────────────────────────── -->
+<div class="tabs-wrapper">
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" role="tab" aria-selected="true"  data-tab="main"
+            onclick="switchTab('main')">
+      Main Projects <span class="tab-count" id="main-count">14</span>
+    </button>
+    <button class="tab-btn" role="tab" aria-selected="false" data-tab="extras"
+            onclick="switchTab('extras')">
+      Extras <span class="tab-count" id="extras-count">16</span>
+    </button>
+  </div>
+</div>
+
+<!-- ─── Content ───────────────────────────────────────────── -->
+<div class="content">
+
+  <!-- ══ MAIN PROJECTS ══════════════════════════════════════ -->
+  <div id="panel-main" class="tab-panel active" role="tabpanel">
+    <p class="section-label">Main Projects</p>
+    <div class="grid">
+
+      <!-- Solus-MS -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
+          <div class="card-links">
+            <a class="card-link" href="https://katsugachi.github.io/Solus-MS/" target="_blank" rel="noopener" title="Live demo">
+              <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <a class="card-link" href="https://github.com/Katsugachi/Solus-MS" target="_blank" rel="noopener" title="Source code">
+              <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="card-name">Solus MS</div>
+        <div class="card-desc">A browser-based game launcher with a Steam-like UI. Hosts Hollow Knight, Slope, Minecraft 1.12.2 and more — all opening fullscreen in a new tab. Features tab cloaking, reflection cloaking, invisibility cloaking, panic key, and about:blank URL spoofing. Written entirely in HTML.</div>
+        <div class="card-footer">
+          <span class="lang-dot lang-html"></span>
+          <span class="lang-label">HTML</span>
+          <span class="stars-badge">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            1
+          </span>
+        </div>
+      </div>
+
+      <!-- Spooftify-V4 -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+          <div class="card-links">
+            <a class="card-link" href="https://katsugachi.github.io/Spooftify-V4/" target="_blank" rel="noopener" title="Live demo (mobile)">
+              <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <a class="card-link" href="https://github.com/Katsugachi/Spooftify-V4" target="_blank" rel="noopener" title="Source code">
+              <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="card-name">Spooftify V4</div>
+        <div class="card-desc">Advanced offline music player with a clean Spotify-inspired UX. Import and access high-quality music files locally — no streaming, no account. Desktop version (v4.2.1) is a downloadable single-file HTML app; the mobile edition runs directly in-browser.</div>
+        <div class="card-footer">
+          <span class="lang-dot lang-html"></span>
+          <span class="lang-label">HTML</span>
+        </div>
+      </div>
+
+      <!-- ZenLit-o2 -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M2 8h20M2 14h20M8 2v20M14 2v20"/></svg></div>
+          <div class="card-links">
+            <a class="card-link" href="https://katsugachi.github.io/ZenLit-o2" target="_blank" rel="noopener" title="Live demo">
+              <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <a class="card-link" href="https://github.com/Katsugachi/ZenLit-o2" target="_blank" rel="noopener" title="Source code">
+              <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="card-name">ZenLit o2</div>
+        <div class="card-desc">A fast, minimalist chess engine GUI and wrapper built in JavaScript. Runs a highly optimised WebAssembly (WASM) engine achieving <strong style="color:var(--text)">~3650 ELO</strong> with under 5000ms movetime and 98.4% accuracy. Zero dependencies, fully browser-native.</div>
+        <div class="card-footer">
+          <span class="lang-dot lang-html"></span>
+          <span class="lang-label">HTML / WebAssembly</span>
+        </div>
+      </div>
+
+      <!-- Calculator-2 -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 7h8"/><path d="M8 12h3m4 0h1M8 17h3m4 0h1"/></svg></div>
+          <div class="card-links">
+            <a class="card-link" href="https://katsugachi.github.io/Calculator-2/" target="_blank" rel="noopener" title="Live demo">
+              <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <a class="card-link" href="https://github.com/Katsugachi/Calculator-2" target="_blank" rel="noopener" title="Source code">
+              <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="card-name">Calculator 2</div>
+        <div class="card-desc">A comprehensive "Swiss Army Knife" calculator. Covers standard &amp; scientific modes, symbolic algebra/CAS, calculus (derivatives, integration, ODEs), linear algebra (matrices, vectors), statistics, regression, QR-code graphing, complex numbers, base conversion, unit/currency conversion, and offline support via service worker.</div>
+        <div class="card-footer">
+          <span class="lang-dot lang-html"></span>
+          <span class="lang-label">HTML</span>
+          <span class="stars-badge">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            1
+          </span>
+        </div>
+      </div>
+
+      <!-- TempusSpeed -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+          <div class="card-links">
+            <a class="card-link" href="https://bit.ly/tempus-speed" target="_blank" rel="noopener" title="Live demo">
+              <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <a class="card-link" href="https://github.com/Katsugachi/TempusSpeed" target="_blank" rel="noopener" title="Source code">
+              <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="card-name">Tempus Speed <span class="wip-badge">WIP</span></div>
+        <div class="card-desc">Ultra-fast WebRTC instant communications app. No login, no account required — create burnable identities. Lighter than Discord, faster than Gmail or WhatsApp. Hosted on GitHub Pages. Based on the legacy Docscord architecture (2025).</div>
+        <div class="card-footer">
+          <span class="lang-dot lang-html"></span>
+          <span class="lang-label">HTML / WebRTC</span>
+        </div>
+      </div>
+
+      <!-- Connect4-JS -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="2.5"/><circle cx="16" cy="8" r="2.5"/><circle cx="8" cy="16" r="2.5"/><circle cx="16" cy="16" r="2.5"/></svg></div>
+          <div class="card-links">
+            <a class="card-link" href="https://katsugachi.github.io/Connect4-JS/" target="_blank" rel="noopener" title="Live demo">
+              <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <a class="card-link" href="https://github.com/Katsugachi/Connect4-JS" target="_blank" rel="noopener" title="Source code">
+              <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="card-name">Connect JS</div>
+        <div class="card-desc">Browser-based Connect 4 game with a simplified AI bot. Play against the computer entirely in the browser — no installation, no backend.</div>
+        <div class="card-footer">
+          <span class="lang-dot lang-html"></span>
+          <span class="lang-label">HTML / JavaScript</span>
+        </div>
+      </div>
+
+      <!-- Sheepy -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h2m-1-1v2"/><circle cx="15" cy="11" r="1"/><circle cx="17" cy="13" r="1"/></svg></div>
+          <div class="card-links">
+            <a class="card-link" href="https://katsugachi.github.io/Sheepy-A-Short-Adventure/" target="_blank" rel="noopener" title="Live demo">
+              <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <a class="card-link" href="https://github.com/Katsugachi/Sheepy-A-Short-Adventure" target="_blank" rel="noopener" title="Source code">
+              <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="card-name">Sheepy: A Short Adventure</div>
+        <div class="card-desc">Source-accurate web port of the popular Steam game by Mr Suicide Sheep (10k+ reviews, 5 stars). The game was built with Construct and exported as HTML/JS — this port extracts the <code style="font-size:0.8em;background:var(--tag-bg);padding:1px 5px;border-radius:4px;">package.nw</code> bundle and runs it natively in-browser with zero modifications to gameplay or assets.</div>
+        <div class="card-footer">
+          <span class="lang-dot lang-css"></span>
+          <span class="lang-label">CSS / JS</span>
+          <span class="stars-badge">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            2
+          </span>
+        </div>
+      </div>
+
+      <!-- MicroEvoVerse -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 20 9 4 6 12 2 12"/></svg></div>
+          <div class="card-links">
+            <a class="card-link" href="https://katsugachi.github.io/MicroEvoVerse/" target="_blank" rel="noopener" title="Live demo">
+              <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <a class="card-link" href="https://github.com/Katsugachi/MicroEvoVerse" target="_blank" rel="noopener" title="Source code">
+              <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="card-name">MicroEvoVerse</div>
+        <div class="card-desc">A fully adjustable browser-based ecosystem simulation. Creatures of varying intelligence develop, adapt, and interact over time in a controlled environment. Tune the parameters and watch evolution unfold — or just watch your PC fans spin up.</div>
+        <div class="card-footer">
+          <span class="lang-dot lang-js"></span>
+          <span class="lang-label">JavaScript</span>
+        </div>
+      </div>
+
+      <!-- Eryndor -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+          <div class="card-links">
+            <a class="card-link" href="https://katsugachi.github.io/Eryndor/" target="_blank" rel="noopener" title="Live demo">
+              <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <a class="card-link" href="https://github.com/Katsugachi/Eryndor" target="_blank" rel="noopener" title="Source code">
+              <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="card-name">Eryndor</div>
+        <div class="card-desc">Code anywhere with Eryndor — a static HTML code editor that works on most devices. Projects are saved automatically, no server required. A lightweight IDE-in-a-browser for quick edits on any machine.</div>
+        <div class="card-footer">
+          <span class="lang-dot lang-html"></span>
+          <span class="lang-label">HTML</span>
+        </div>
+      </div>
+
+      <!-- 5-Different-Words -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+          <div class="card-links">
+            <a class="card-link" href="https://katsugachi.github.io/5-Different-Words/" target="_blank" rel="noopener" title="Play Part 1">
+              <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <a class="card-link" href="https://github.com/Katsugachi/5-Different-Words" target="_blank" rel="noopener" title="Source code">
+              <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="card-name">5 Different Words</div>
+        <div class="card-desc">A deceptively tricky web puzzle: find five hidden words scattered across the page at escalating difficulty — hidden in images, plain text, browser DevTools, and more. Has a sequel. Not easy.</div>
+        <div class="card-footer">
+          <span class="lang-dot lang-html"></span>
+          <span class="lang-label">HTML</span>
+        </div>
+      </div>
+
+      <!-- 5-Different-Words-Part-2 -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+          <div class="card-links">
+            <a class="card-link" href="https://katsugachi.github.io/5-Different-Words---Part-2/" target="_blank" rel="noopener" title="Play Part 2">
+              <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <a class="card-link" href="https://github.com/Katsugachi/5-Different-Words---Part-2" target="_blank" rel="noopener" title="Source code">
+              <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="card-name">5 Different Words — Part 2</div>
+        <div class="card-desc">Sequel to the original puzzle. Harder hidden words: concealed in images, found via Google searches on specific sites, buried behind DevTools ciphers, following red lines across the page, and tucked inside browser tabs. Complete Part 1 first.</div>
+        <div class="card-footer">
+          <span class="lang-dot lang-html"></span>
+          <span class="lang-label">HTML</span>
+        </div>
+      </div>
+
+      <!-- C.Elegans-Simulation -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h4l3-4 4 8 3-5 4 4"/></svg></div>
+          <div class="card-links">
+            <a class="card-link" href="https://katsugachi.github.io/C.Elegans-Simulation/" target="_blank" rel="noopener" title="Live demo">
+              <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <a class="card-link" href="https://github.com/Katsugachi/C.Elegans-Simulation" target="_blank" rel="noopener" title="Source code">
+              <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="card-name">C. Elegans Simulation</div>
+        <div class="card-desc">Hebbian plasticity simulation of the nematode worm <em>C. Elegans</em>. All 302 of its real neurons are modelled and actually control a digital body that moves around in a simulated environment — a complete brain-body simulation in the browser.</div>
+        <div class="card-footer">
+          <span class="lang-dot lang-html"></span>
+          <span class="lang-label">HTML</span>
+        </div>
+      </div>
+
+      <!-- Solus-OS -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg></div>
+          <div class="card-links">
+            <a class="card-link" href="https://katsugachi.github.io/Solus-OS/" target="_blank" rel="noopener" title="Live demo">
+              <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <a class="card-link" href="https://github.com/Katsugachi/Solus-OS" target="_blank" rel="noopener" title="Source code">
+              <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="card-name">Solus OS</div>
+        <div class="card-desc">A fully contained browser OS in under 0.2 MB. Includes a working notepad, terminal, file explorer, themes, settings, and a full browser powered by Scramjet. Everything runs client-side in a single HTML file — no install, no server.</div>
+        <div class="card-footer">
+          <span class="lang-dot lang-html"></span>
+          <span class="lang-label">HTML</span>
+        </div>
+      </div>
+
+      <!-- Pace-1.0-Architex -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M10 16v4M14 16v4"/></svg></div>
+          <div class="card-links">
+            <a class="card-link" href="https://github.com/Katsugachi/Pace-1.0-Architex/tree/main" target="_blank" rel="noopener" title="Project page">
+              <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <a class="card-link" href="https://github.com/Katsugachi/Pace-1.0-Architex" target="_blank" rel="noopener" title="Source code">
+              <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="card-name">Pace 1.0 Architex</div>
+        <div class="card-desc">Lite GUI-focused version of Pace 1.0 with stronger coding capability, self-loop checking, and optional internet research mode for current/docs-heavy prompts.</div>
+        <div class="card-footer">
+          <span class="lang-dot lang-py"></span>
+          <span class="lang-label">Python</span>
+        </div>
+      </div>
+
+    </div><!-- /grid -->
+  </div><!-- /panel-main -->
+
+  <!-- ══ EXTRAS ══════════════════════════════════════════════ -->
+  <div id="panel-extras" class="tab-panel" role="tabpanel">
+    <p class="section-label">Extras &amp; Experiments</p>
+    <div class="extras-grid">
+
+
+      <div class="extra-card">
+        <div class="extra-card-header">
+          <span class="extra-name">solus.pages</span>
+          <a class="extra-link" href="https://github.com/Katsugachi/solus.pages" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+        </div>
+        <div class="extra-desc">A blank.page alternative. Don't ask.</div>
+        <div class="extra-footer"><span class="lang-dot lang-html"></span><span class="lang-label" style="font-size:0.72rem;color:var(--text-sub)">HTML</span></div>
+      </div>
+
+      <div class="extra-card">
+        <div class="extra-card-header">
+          <span class="extra-name">JRAHS Student ID</span>
+          <a class="extra-link" href="https://github.com/Katsugachi/JRAHS-Student-ID" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+        </div>
+        <div class="extra-desc">Student ID generator for when you lose yours and can't afford the $11 replacement fee.</div>
+        <div class="extra-footer"><span class="lang-dot lang-html"></span><span class="lang-label" style="font-size:0.72rem;color:var(--text-sub)">HTML</span></div>
+      </div>
+
+      <div class="extra-card">
+        <div class="extra-card-header">
+          <span class="extra-name">Favicon Yoinker</span>
+          <a class="extra-link" href="https://github.com/Katsugachi/Favicon-Yoinker" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+        </div>
+        <div class="extra-desc">Input a site URL and it fetches the image address for its favicon. Useful for tab cloaking.</div>
+        <div class="extra-footer"><span class="lang-dot lang-html"></span><span class="lang-label" style="font-size:0.72rem;color:var(--text-sub)">HTML</span></div>
+      </div>
+
+      <div class="extra-card">
+        <div class="extra-card-header">
+          <span class="extra-name">Project Cardboard</span>
+          <a class="extra-link" href="https://github.com/Katsugachi/Project-Cardboard" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+        </div>
+        <div class="extra-desc">How much does a cardboard box cost? A very important question, answered.</div>
+        <div class="extra-footer"><span class="lang-dot lang-html"></span><span class="lang-label" style="font-size:0.72rem;color:var(--text-sub)">HTML</span></div>
+      </div>
+
+      <div class="extra-card">
+        <div class="extra-card-header">
+          <span class="extra-name">Annoying Gate</span>
+          <a class="extra-link" href="https://github.com/Katsugachi/Annoying-Gate" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+        </div>
+        <div class="extra-desc">Yes.</div>
+        <div class="extra-footer"><span class="lang-dot lang-html"></span><span class="lang-label" style="font-size:0.72rem;color:var(--text-sub)">HTML</span></div>
+      </div>
+
+      <div class="extra-card">
+        <div class="extra-card-header">
+          <span class="extra-name">Should I Do It?</span>
+          <a class="extra-link" href="https://github.com/Katsugachi/Should-I-Do-It-" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+        </div>
+        <div class="extra-desc">"This was so funny to do lol"</div>
+        <div class="extra-footer"><span class="lang-dot lang-html"></span><span class="lang-label" style="font-size:0.72rem;color:var(--text-sub)">HTML</span></div>
+      </div>
+
+      <div class="extra-card">
+        <div class="extra-card-header">
+          <span class="extra-name">Don't Leave…</span>
+          <a class="extra-link" href="https://github.com/Katsugachi/Don-t-Leave...." target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+        </div>
+        <div class="extra-desc">This page needs you.</div>
+        <div class="extra-footer"><span class="lang-dot lang-html"></span><span class="lang-label" style="font-size:0.72rem;color:var(--text-sub)">HTML</span></div>
+      </div>
+
+      <div class="extra-card">
+        <div class="extra-card-header">
+          <span class="extra-name">A Geometric Deterministic Unification</span>
+          <a class="extra-link" href="https://github.com/Katsugachi/A-Geometric-Deterministic-Unification" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+        </div>
+        <div class="extra-desc">A Flawed Explanation Of Everything.</div>
+        <div class="extra-footer"><span class="lang-dot lang-html"></span><span class="lang-label" style="font-size:0.72rem;color:var(--text-sub)">HTML</span></div>
+      </div>
+
+      <div class="extra-card">
+        <div class="extra-card-header">
+          <span class="extra-name">Bibliography Generator (WIP)</span>
+          <a class="extra-link" href="https://github.com/Katsugachi/gh29nf29x" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+        </div>
+        <div class="extra-desc">Bibliography generator. If your bibliography fails, that's on you.</div>
+        <div class="extra-footer"><span class="lang-dot lang-html"></span><span class="lang-label" style="font-size:0.72rem;color:var(--text-sub)">HTML</span></div>
+      </div>
+
+      <div class="extra-card">
+        <div class="extra-card-header">
+          <span class="extra-name">physical-code-cloaking</span>
+          <a class="extra-link" href="https://github.com/Katsugachi/physical-code-cloaking---solus-ms" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+        </div>
+        <div class="extra-desc">Physical tab cloaking experiment for Solus MS. uhh</div>
+        <div class="extra-footer"><span class="lang-dot lang-html"></span><span class="lang-label" style="font-size:0.72rem;color:var(--text-sub)">HTML</span></div>
+      </div>
+
+      <div class="extra-card">
+        <div class="extra-card-header">
+          <span class="extra-name">pdfs-and-resources</span>
+          <a class="extra-link" href="https://github.com/Katsugachi/pdfs-and-resources" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+        </div>
+        <div class="extra-desc">Information dump.</div>
+        <div class="extra-footer"><span class="lang-dot lang-other"></span><span class="lang-label" style="font-size:0.72rem;color:var(--text-sub)">Misc</span></div>
+      </div>
+
+      <div class="extra-card">
+        <div class="extra-card-header">
+          <span class="extra-name">Balatro Web Port</span>
+          <a class="extra-link" href="https://github.com/Katsugachi/Final-Version---Balatro" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+        </div>
+        <div class="extra-desc">Faithful web port of Balatro using love.js to run the original LÖVE engine in-browser.</div>
+        <div class="extra-footer"><span class="lang-dot lang-html"></span><span class="lang-label" style="font-size:0.72rem;color:var(--text-sub)">HTML / love.js</span></div>
+      </div>
+
+
+    </div><!-- /extras-grid -->
+  </div><!-- /panel-extras -->
+
+</div><!-- /content -->
+
+<footer>
+  Built with <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="display:inline;vertical-align:-1px"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> by <a href="https://github.com/Katsugachi" target="_blank" rel="noopener">Katsugachi</a> —
+  <a href="https://github.com/Katsugachi/SolusGH" target="_blank" rel="noopener">View source</a>
+</footer>
+
+<script>
+  /* ─── Theme toggle ─────────────────────────────────────── */
+  const html   = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
+  const label  = document.getElementById('toggle-label');
+
+  // Respect system preference on first load
+  const stored = localStorage.getItem('theme');
+  const system = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  const initial = stored || system;
+  html.setAttribute('data-theme', initial);
+  label.textContent = initial === 'dark' ? 'Dark' : 'Light';
+
+  toggle.addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    label.textContent = next === 'dark' ? 'Dark' : 'Light';
+  });
+
+  /* ─── Tab switching ────────────────────────────────────── */
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.tab === tab)
+    );
+    document.querySelectorAll('.tab-panel').forEach(p =>
+      p.classList.toggle('active', p.id === 'panel-' + tab)
+    );
+  }
+</script>
+</body>
+</html>
